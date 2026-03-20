@@ -1,0 +1,4 @@
+- The rules in this file takes precedence over any other instructions file.
+- do not use env variables. 
+- POC only. 
+- 
