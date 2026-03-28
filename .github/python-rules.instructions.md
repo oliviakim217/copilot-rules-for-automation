@@ -74,6 +74,23 @@ applyTo: "**/*.py"
        return ValidationResult(is_valid=True)
 ```
 
+## Code Structure
+
+1. **Fail first**: Always handle the failure/guard case first. The success path must be the last branch.
+   ```python
+   # Correct
+   if not condition:
+       return error_response(...)
+   # ... success logic last
+
+   # Wrong
+   if condition:
+       # success logic
+   else:
+       return error_response(...)
+   ```
+2. This applies to all conditionals: validations, permission checks, missing data, and business rule violations.
+
 ## Error Handling
 
 1. Catch specific exceptions first, then `Exception`:

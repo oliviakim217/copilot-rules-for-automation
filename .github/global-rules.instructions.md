@@ -53,11 +53,26 @@ applyTo: "**"
 
 ## Validation Pipeline (non-negotiable order)
 ```
-Receive Input → Pydantic Validation → Business Validation →
+Receive Input → Pydantic Validation → SQL Injection Check → Business Validation →
 Transform → Enrich → Call External API → Build Response
 ```
 
 Never skip or reorder these stages.
+
+## SQL Injection Prevention
+
+1. **Never** interpolate user input directly into SQL strings.
+2. Always use parameterized queries / prepared statements:
+   ```python
+   # Correct
+   cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+
+   # Wrong
+   cursor.execute(f"SELECT * FROM users WHERE id = {user_id}")
+   ```
+3. Reject any input containing SQL meta-characters (`'`, `"`, `;`, `--`, `/*`, `*/`, `xp_`, `UNION`, `DROP`, etc.) before it reaches the query layer.
+4. Use an allowlist (whitelist) for dynamic identifiers (table/column names) — never build them from raw input.
+5. Apply this check in the **Validation Pipeline** immediately after Pydantic validation, before any business logic.
 
 ## Config Files
 
