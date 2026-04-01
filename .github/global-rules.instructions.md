@@ -74,6 +74,43 @@ Never skip or reorder these stages.
 4. Use an allowlist (whitelist) for dynamic identifiers (table/column names) — never build them from raw input.
 5. Apply this check in the **Validation Pipeline** immediately after Pydantic validation, before any business logic.
 
+## Scripts (PowerShell and Bash)
+
+1. All scripts must return an explicit exit/status code.
+2. PowerShell: use `exit 0` for success, `exit 1` (or non-zero) for failure. Check `$LASTEXITCODE` after calling external commands.
+   ```powershell
+   try {
+       Invoke-RestMethod ...
+       Write-Host "SUCCESS"
+       exit 0
+   } catch {
+       Write-Error "FAILED: $_"
+       exit 1
+   }
+   ```
+3. Bash: use `exit 0` / `exit 1`. Check `$?` after critical commands.
+   ```bash
+   curl -f ... || { echo "ERROR: request failed"; exit 1; }
+   echo "SUCCESS"
+   exit 0
+   ```
+4. Never let a script exit silently on failure — always log the error before exiting.
+
+## Config File Frontmatter
+
+1. Every YAML config file must begin with a frontmatter block describing the file itself:
+   ```yaml
+   ---
+   description: "Dev environment config for BSS Service"
+   environment: "dev"
+   version: "1.0.0"
+   last_updated: "2026-03-31"
+   ---
+   ```
+2. The frontmatter is metadata about the file — not application config. Keep it separate from the actual config values below it.
+3. Required frontmatter fields: `description`, `environment`, `version`, `last_updated`.
+4. Do not omit frontmatter, even in dev configs.
+
 ## Config Files
 
 1. Use YAML for all application config.

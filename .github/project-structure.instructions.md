@@ -171,6 +171,31 @@ Error example:
 }
 ```
 
+## API Schema Files
+
+1. Every API endpoint must have a corresponding JSON schema file stored in `references/schemas/`.
+2. File naming: `<resource>_<action>_request.json` and `<resource>_<action>_response.json`.
+   - Examples: `story_create_request.json`, `story_create_response.json`
+3. Schema files must reflect the actual request/response shape used by the endpoint — keep them in sync.
+4. Use JSON Schema draft-07 format:
+   ```json
+   {
+     "$schema": "http://json-schema.org/draft-07/schema#",
+     "title": "CreateStoryRequest",
+     "type": "object",
+     "required": ["staff_id", "project_key", "issue_type", "summary"],
+     "properties": {
+       "staff_id":    { "type": "string", "pattern": "^\\d{8}$" },
+       "project_key": { "type": "string" },
+       "issue_type":  { "type": "string" },
+       "summary":     { "type": "string", "maxLength": 2000 },
+       "description": { "type": "string" },
+       "priority":    { "type": "string" }
+     }
+   }
+   ```
+5. These files serve as living documentation — they are the source of truth for API contract.
+
 ## HTTP Status Codes
 
 - `200` — success
